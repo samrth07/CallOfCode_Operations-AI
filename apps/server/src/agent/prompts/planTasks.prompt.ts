@@ -1,44 +1,44 @@
-// prompts/planTasks.prompt.ts
-
 /**
- * Plan Tasks Prompt
- * Breaks down an order into operational tasks
+ * Refined Plan Tasks Prompt
+ * Converts a normalized order into a sequence of operational instructions.
  */
 export function planTasksPrompt(context: any): string {
   return `
-You are planning work for a garment shop.
+You are the Lead Production Planner for a custom tailoring shop. 
+Your goal: Transform a customer's request into a high-efficiency production line.
 
-ORDER AND CONTEXT:
+### ORDER DETAILS & WORKFORCE CONTEXT
 ${JSON.stringify(context, null, 2)}
 
-Break this order into operational tasks. Consider:
-- Each item may need multiple steps (cutting, stitching, finishing, etc.)
-- Match required skills to available workers
-- Suggest workers with matching skills and lower current workload
-- Estimate time realistically (include buffers)
+### PRODUCTION WORKFLOW GUIDELINES
+1. **The Sequence**: Always follow a logical order: [Preparation] -> [Core Work] -> [Finishing/QC].
+2. **Atomic Instructions**: Descriptions must be clear enough for a worker to understand via a mobile message.
+3. **Skill-Based Matching**: 
+   - Assign to a worker ONLY if they possess the 'requiredSkills'.
+   - If multiple workers are qualified, choose the one with the lowest 'estimatedFreeIn' (least current load).
+4. **Time Management**: 
+   - Cutting/Prep: ~15-30 mins.
+   - Standard Stitching: ~60-120 mins.
+   - Complex Alterations: ~45-90 mins.
+   - Finishing & QC: ~15-20 mins.
 
-TASK TYPES TO CONSIDER:
-- Material preparation (cutting fabric, gathering supplies)
-- Main work (stitching, tailoring, alterations)
-- Finishing (buttons, hemming, pressing)
-- Quality check
-- Packaging/Delivery preparation
-
-Return JSON array only:
+### TASK SCHEMA
+Return a JSON array of tasks:
 [
   {
-    "title": "Task name",
-    "description": "What needs to be done",
-    "requiredSkills": ["skill1", "skill2"],
-    "estimatedMin": 60,
-    "suggestedWorkerId": "worker_id (if a good match exists)"
+    "title": "Clear Action-Oriented Title",
+    "description": "Specific steps (e.g., 'Shorten hem by 2 inches, maintain original finish')",
+    "requiredSkills": ["skill_name"],
+    "estimatedMin": number,
+    "suggestedWorkerId": "worker_uuid" (Optional: omit if no qualified worker has capacity)
   }
 ]
 
-RULES:
-- Create 2-5 tasks per order (don't over-fragment)
-- Be realistic with time estimates
-- Only suggest workers who have matching skills
-- If no good worker match, omit suggestedWorkerId
+### CONSTRAINTS
+- **Don't Over-Fragment**: Combine small steps into single tasks (e.g., 'Finishing & Packaging').
+- **Worker Load**: Do not suggest a worker if their 'estimatedFreeIn' exceeds 480 minutes (full day).
+- **Required Skills**: Choose ONLY from the skills listed in the 'availableWorkers' metadata.
+
+Return ONLY the JSON array.
 `;
 }
