@@ -6,14 +6,69 @@ import {
     validate,
     updateInventorySchema,
     supplierWebhookSchema,
+    createInventoryItemSchema,
+    updateInventoryItemSchema,
 } from "../../middleware/validation.middleware";
 import { UserRole } from "../../types/types";
+import { upload } from "../../config/upload.config";
 
 const router: IRouter = Router();
 
 /**
+ * @route   POST /api/inventory/create
+ * @desc    Create new inventory item with optional image
+ * @access  Owner
+ */
+router.post(
+    "/create",
+    authenticate,
+    requireRole([UserRole.OWNER]),
+    upload.single("photo"),
+    validate(createInventoryItemSchema),
+    (req, res, next) => inventoryController.createInventoryItem(req, res).catch(next),
+);
+
+/**
+ * @route   GET /api/inventory
+ * @desc    Get all inventory items
+ * @access  Owner
+ */
+router.get(
+    "/",
+    authenticate,
+    requireRole([UserRole.OWNER]),
+    (req, res, next) => inventoryController.getInventoryItems(req, res).catch(next),
+);
+
+/**
+ * @route   GET /api/inventory/:sku
+ * @desc    Get single inventory item
+ * @access  Owner
+ */
+router.get(
+    "/:sku",
+    authenticate,
+    requireRole([UserRole.OWNER]),
+    (req, res, next) => inventoryController.getInventoryItem(req, res).catch(next),
+);
+
+/**
+ * @route   PATCH /api/inventory/:sku
+ * @desc    Update inventory item with optional image
+ * @access  Owner
+ */
+router.patch(
+    "/:sku",
+    authenticate,
+    requireRole([UserRole.OWNER]),
+    upload.single("photo"),
+    validate(updateInventoryItemSchema),
+    (req, res, next) => inventoryController.updateInventoryItem(req, res).catch(next),
+);
+
+/**
  * @route   POST /api/inventory/update
- * @desc    Update inventory
+ * @desc    Update inventory quantity (legacy endpoint)
  * @access  Owner
  */
 router.post(
@@ -48,3 +103,4 @@ router.post(
 );
 
 export default router;
+

@@ -99,3 +99,16 @@ export const supplierWebhookSchema = z.object({
     orderRef: z.string(),
     eta: z.string().datetime(),
 });
+
+export const createInventoryItemSchema = z.object({
+    sku: z.string().min(1),
+    name: z.string().min(1),
+    quantity: z.coerce.number().int().min(0),
+    reorderPoint: z.coerce.number().int().min(0),
+});
+
+export const updateInventoryItemSchema = z.object({
+    name: z.string().min(1).optional(),
+    quantity: z.coerce.number().int().min(0).optional(),
+    reorderPoint: z.coerce.number().int().min(0).optional(),
+});

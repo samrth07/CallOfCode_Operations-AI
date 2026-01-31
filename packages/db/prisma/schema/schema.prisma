@@ -162,11 +162,12 @@ model Task {
 }
 
 model InventoryItem {
-  id           String @id @default(uuid())
-  sku          String @unique
+  id           String  @id @default(uuid())
+  sku          String  @unique
   name         String
   quantity     Int
   reorderPoint Int
+  imageUrl     String?
 
   updatedAt DateTime @updatedAt
 }
