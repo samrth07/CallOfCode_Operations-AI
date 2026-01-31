@@ -45,6 +45,15 @@ export type AlterationType =
 
 export type RequestType = "alteration" | "order" | "stitching";
 
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: UserRole;
+};
+
+
 export interface RequestItem {
     sku: string;
     qty: number;
