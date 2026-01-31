@@ -4,6 +4,12 @@ import type {
     SupplierWebhookRequest,
     SuccessResponse,
 } from "../types/types";
+import prisma from "@Hackron/db";
+import { AppError } from "../middleware/error.middleware";
+import { uploadImage } from "../utils/imageUtils";
+import { supabase } from "../config/upload.config";
+
+type MulterFile = Express.Multer.File;
 
 /**
  * Inventory Controller - Handles inventory and supplier endpoints
@@ -11,52 +17,159 @@ import type {
 
 export class InventoryController {
     /**
+     * POST /api/inventory/create
+     * Create new inventory item with optional image
+     */
+    async createInventoryItem(req: Request, res: Response): Promise<void> {
+        const { sku, name, quantity, reorderPoint } = req.body;
+        const file = req.file as MulterFile | undefined;
+
+        // Check if SKU already exists
+        const existing = await prisma.inventoryItem.findUnique({
+            where: { sku },
+        });
+
+        if (existing) {
+            throw new AppError(400, "Inventory item with this SKU already exists");
+        }
+
+        let imageUrl: string | undefined;
+
+        // Upload image if provided
+        if (file) {
+            imageUrl = await uploadImage(supabase, file, "Inventory");
+        }
+
+        // Create inventory item
+        const item = await prisma.inventoryItem.create({
+            data: {
+                sku,
+                name,
+                quantity,
+                reorderPoint,
+                imageUrl,
+            },
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Inventory item created successfully",
+            data: item,
+        });
+    }
+
+    /**
+     * GET /api/inventory
+     * Get all inventory items
+     */
+    async getInventoryItems(_req: Request, res: Response): Promise<void> {
+        const items = await prisma.inventoryItem.findMany({
+            orderBy: { name: "asc" },
+        });
+
+        res.status(200).json({
+            success: true,
+            data: items,
+        });
+    }
+
+    /**
+     * GET /api/inventory/:sku
+     * Get single inventory item
+     */
+    async getInventoryItem(req: Request, res: Response): Promise<void> {
+        const sku = req.params.sku as string;
+
+        const item = await prisma.inventoryItem.findUnique({
+            where: { sku },
+        });
+
+        if (!item) {
+            throw new AppError(404, "Inventory item not found");
+        }
+
+        res.status(200).json({
+            success: true,
+            data: item,
+        });
+    }
+
+    /**
+     * PATCH /api/inventory/:sku
+     * Update inventory item with optional image replacement
+     */
+    async updateInventoryItem(req: Request, res: Response): Promise<void> {
+        const sku = req.params.sku as string;
+        const { name, quantity, reorderPoint } = req.body;
+        const file = req.file as MulterFile | undefined;
+
+        // Get existing item
+        const existing = await prisma.inventoryItem.findUnique({
+            where: { sku },
+        });
+
+        if (!existing) {
+            throw new AppError(404, "Inventory item not found");
+        }
+
+        let imageUrl: string | undefined = existing.imageUrl || undefined;
+
+        // Handle image update
+        if (file) {
+            const oldImage = existing.imageUrl;
+
+            // Upload new image (and delete old one if exists)
+            if (oldImage) {
+                imageUrl = await uploadImage(supabase, file, "Inventory", oldImage);
+            } else {
+                imageUrl = await uploadImage(supabase, file, "Inventory");
+            }
+        }
+
+        // Update inventory item
+        const item = await prisma.inventoryItem.update({
+            where: { sku },
+            data: {
+                ...(name !== undefined && { name }),
+                ...(quantity !== undefined && { quantity }),
+                ...(reorderPoint !== undefined && { reorderPoint }),
+                ...(file && { imageUrl }),
+            },
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Inventory item updated successfully",
+            data: item,
+        });
+    }
+
+    /**
      * POST /api/inventory/update
-     * Update inventory (manual adjustment)
+     * Update inventory (manual adjustment) - Legacy endpoint
      */
     async updateInventory(req: Request, res: Response): Promise<void> {
         const { sku, delta, source } = req.body as UpdateInventoryRequest;
+        const skuString = typeof sku === 'string' ? sku : String(sku);
 
-        // TODO: Implement with Prisma
-        console.log("Updating inventory:", { sku, delta, source });
+        const item = await prisma.inventoryItem.findUnique({
+            where: { sku: skuString },
+        });
 
-        // In production:
-        // const item = await prisma.inventoryItem.findUnique({
-        //   where: { sku },
-        // });
-        //
-        // if (!item) {
-        //   throw new AppError(404, 'Inventory item not found');
-        // }
-        //
-        // await prisma.inventoryItem.update({
-        //   where: { sku },
-        //   data: {
-        //     quantity: {
-        //       increment: delta,
-        //     },
-        //   },
-        // });
-        //
-        // // Create audit log
-        // await auditService.createAuditAction({
-        //   actor: AuditActor.OWNER,
-        //   action: 'inventory_update',
-        //   context: { sku, delta, source },
-        // });
-        //
-        // // Check if below reorder point
-        // const updated = await prisma.inventoryItem.findUnique({
-        //   where: { sku },
-        // });
-        //
-        // if (updated && updated.quantity <= updated.reorderPoint) {
-        //   // Trigger agent to handle reorder
-        //   await agentService.enqueueJob({
-        //     type: 'inventory_low',
-        //     payload: { sku, quantity: updated.quantity },
-        //   });
-        // }
+        if (!item) {
+            throw new AppError(404, "Inventory item not found");
+        }
+
+        await prisma.inventoryItem.update({
+            where: { sku: skuString },
+            data: {
+                quantity: {
+                    increment: delta,
+                },
+            },
+        });
+
+        console.log("Inventory updated:", { sku, delta, source });
 
         const response: SuccessResponse = {
             success: true,
@@ -75,31 +188,10 @@ export class InventoryController {
         // TODO: Implement with Prisma
         console.log("Supplier webhook received:", { orderRef, eta });
 
-        // In production:
-        // const order = await prisma.supplierOrder.findFirst({
-        //   where: { id: orderRef },
-        // });
-        //
-        // if (!order) {
-        //   throw new AppError(404, 'Supplier order not found');
-        // }
-        //
-        // await prisma.supplierOrder.update({
-        //   where: { id: orderRef },
-        //   data: {
-        //     eta: new Date(eta),
-        //   },
-        // });
-        //
-        // // Trigger agent to re-evaluate affected requests
-        // await agentService.enqueueJob({
-        //   type: 'supplier_update',
-        //   payload: { orderRef, eta },
-        // });
-
         // Webhook response
         res.status(200).json({ success: true });
     }
 }
 
 export const inventoryController = new InventoryController();
+
