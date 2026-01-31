@@ -1,0 +1,4 @@
+id,customerId,source,status,priority,payload
+req-001,cust-001,web,NEW,5,"{""type"":""alteration"",""items"":[{""sku"":""SH-001"",""qty"":1,""size"":""M"",""alteration_type"":""sleeve_shortening"",""measurement"":{""sleeve_cm"":58}}],""required_skills"":[""tailoring""],""estimated_minutes"":45,""notes"":""Shorten sleeves by 3cm""}"
+req-002,cust-002,whatsapp,NEW,3,"{""type"":""stitching"",""items"":[{""sku"":""BL-001"",""qty"":2,""size"":""S"",""color"":""Red""}],""required_skills"":[""stitching"",""tailoring""],""estimated_minutes"":120,""notes"":""Custom blouse stitching""}"
+req-003,cust-003,web,NEW,7,"{""type"":""order"",""items"":[{""sku"":""KU-001"",""qty"":3,""size"":""L"",""color"":""White""}],""required_skills"":[""tailoring""],""estimated_minutes"":180,""notes"":""Bulk kurta order for wedding""}"

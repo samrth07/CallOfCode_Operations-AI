@@ -1,0 +1,11 @@
+id,sku,name,quantity,reorderPoint
+inv-001,SH-001,Cotton Shirt Blue,25,5
+inv-002,SH-002,Cotton Shirt White,30,5
+inv-003,PN-001,Formal Pants Black,20,5
+inv-004,PN-002,Formal Pants Grey,15,5
+inv-005,KU-001,Cotton Kurta,18,3
+inv-006,SA-001,Silk Saree,10,2
+inv-007,BL-001,Blouse Material,40,10
+inv-008,TH-001,Thread Assorted,100,20
+inv-009,BT-001,Buttons Pack,200,50
+inv-010,ZP-001,Zippers Pack,50,10
