@@ -44,7 +44,7 @@ enum AuditActor {
 //// MODELS
 
 model User {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   email        String   @unique
   phone        String?  @unique
   name         String
@@ -67,7 +67,7 @@ model User {
 }
 
 model Customer {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String   @unique
   email     String
   phone     String?
@@ -84,7 +84,7 @@ model Customer {
 }
 
 model Worker {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String   @unique
   email     String
   phone     String?
@@ -101,7 +101,7 @@ model Worker {
 }
 
 model Owner {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String   @unique
   email     String
   phone     String?
