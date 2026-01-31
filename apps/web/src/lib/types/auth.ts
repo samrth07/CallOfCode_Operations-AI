@@ -25,6 +25,7 @@ export interface AuthResponse {
 export interface LoginInput {
     email: string;
     password: string;
+    role: UserRole;
 }
 
 export interface RegisterCustomerInput {

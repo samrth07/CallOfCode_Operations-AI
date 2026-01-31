@@ -30,6 +30,7 @@
   "dependencies": {
     "@Hackron/env": "workspace:*",
     "dotenv": "catalog:",
+    "framer-motion": "^12.29.2",
     "zod": "catalog:"
   },
   "devDependencies": {

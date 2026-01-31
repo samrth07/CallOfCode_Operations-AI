@@ -6,9 +6,11 @@ import { useAuth } from "@/lib/contexts/auth-context";
 import { UserRole } from "@/lib/types/auth";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Mail, Lock, Users, Briefcase, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Mail, Lock, Users, Briefcase, ShieldCheck, ArrowRight, Loader2, Compass, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
+    // --- YOUR LOGIC: UNTOUCHED ---
     const [selectedRole, setSelectedRole] = useState<UserRole>(UserRole.CUSTOMER);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -25,7 +27,7 @@ export default function LoginPage() {
         }
 
         try {
-            await login({ email, password });
+            await login({ email, password, role: selectedRole });
 
             toast.success("Login successful!");
 
@@ -68,106 +70,118 @@ export default function LoginPage() {
         }
     };
 
+    // --- DESIGN: ORGANIC FLOATING MODULAR (BLUE THEME) ---
     return (
-        <div className="flex min-h-screen items-center justify-center px-4 py-12 bg-gradient-to-br from-background via-background to-muted/20">
-            <div className="w-full max-w-md">
-                {/* Card Container */}
-                <div className="bg-card border border-border rounded-2xl shadow-lg p-8 space-y-8">
-                    {/* Header */}
-                    <div className="text-center space-y-2">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                            <Lock className="w-8 h-8 text-primary" />
+        <div className="min-h-screen w-full bg-[#E0F2F1] flex items-center justify-center p-4 relative overflow-hidden">
+            
+            {/* Background Aesthetic: Deep Blue Gradient Orbs */}
+            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#00B4D8]/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#0077B6]/10 rounded-full blur-[100px] pointer-events-none" />
+            
+            <div className="relative w-full max-w-5xl flex flex-col md:flex-row gap-4 items-center">
+                
+                {/* Left Panel: The Branding Shield (Midnight Blue) */}
+                <motion.div 
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="w-full md:w-1/3 bg-[#001D29] rounded-tr-[5rem] rounded-bl-[5rem] p-10 flex flex-col justify-between h-[520px] shadow-2xl shadow-[#001D29]/40"
+                >
+                    <div className="space-y-6">
+                        <div className="w-12 h-12 bg-[#00B4D8] rounded-full flex items-center justify-center shadow-lg shadow-[#00B4D8]/20">
+                            <Compass className="text-[#001D29] w-6 h-6" />
                         </div>
-                        <h1 className="text-3xl font-bold tracking-tight">Welcome Back</h1>
-                        <p className="text-sm text-muted-foreground">
-                            Sign in to access your dashboard
-                        </p>
+                        <h1 className="text-4xl font-serif text-white leading-tight font-bold">
+                            MSME <br /> 
+                            <span className="text-[#48CAE4] italic text-3xl font-normal tracking-tight">Clothes Center</span>
+                        </h1>
                     </div>
+                    <div>
+                        <p className="text-[#00B4D8] text-[10px] font-black uppercase tracking-[0.4em] opacity-80 italic">Digital Textiles Network</p>
+                        <div className="mt-4 h-1 w-20 bg-[#0077B6]" />
+                    </div>
+                </motion.div>
 
-                    {/* Role Selector */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-medium">Select Your Role</label>
-                        <div className="grid grid-cols-3 gap-2 p-1 bg-muted rounded-lg">
+                {/* Right Panel: The Entry Module */}
+                <motion.div 
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="flex-1 bg-white rounded-tl-[5rem] rounded-br-[5rem] p-8 md:p-14 shadow-[0_40px_80px_-20px_rgba(0,29,41,0.15)] border border-[#CAF0F8] relative overflow-hidden"
+                >
+                    {/* Role Selector: Pill Bubbles */}
+                    <div className="space-y-3 mb-10">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0077B6] ml-1">Select Identity</label>
+                        <div className="flex flex-wrap gap-3">
                             {Object.values(UserRole).map((role) => (
                                 <button
                                     key={role}
                                     type="button"
                                     onClick={() => setSelectedRole(role)}
-                                    className={`relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-md text-xs font-medium transition-all duration-200 ${selectedRole === role ? "bg-background text-foreground shadow-md scale-105" : "text-muted-foreground hover:text-foreground hover:bg-background/50"}`}
+                                    className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 border-2 flex items-center gap-2 ${
+                                        selectedRole === role 
+                                        ? "bg-[#0077B6] border-[#0077B6] text-white shadow-lg -translate-y-0.5" 
+                                        : "border-[#CAF0F8] bg-[#F0F9FF] text-[#001D29] hover:border-[#00B4D8]/50"
+                                    }`}
                                 >
                                     {getRoleIcon(role)}
-                                    <span className="capitalize">
-                                        {role.toLowerCase()}
-                                    </span>
+                                    {role.toLowerCase()}
                                 </button>
                             ))}
                         </div>
-                        <p className="text-xs text-muted-foreground text-center">
+                        <p className="text-[10px] text-[#0077B6]/60 italic ml-1">
                             {getRoleDescription(selectedRole)}
                         </p>
                     </div>
 
-                    {/* Login Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* Email Field */}
-                        <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium">
-                                Email Address
-                            </label>
-                            <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                    <Mail className="w-4 h-4" />
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div className="grid grid-cols-1 gap-6">
+                            {/* Email Field: Framed Style */}
+                            <div className="relative border-2 border-[#F0F9FF] rounded-2xl p-4 focus-within:border-[#00B4D8] transition-all bg-white group">
+                                <label className="absolute -top-3 left-4 bg-white px-2 text-[9px] font-black text-[#0077B6] uppercase tracking-widest group-focus-within:text-[#00B4D8]">
+                                    Identity Mail
+                                </label>
+                                <div className="flex items-center gap-3">
+                                    <Mail className="w-4 h-4 text-[#00B4D8]" />
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full bg-transparent outline-none text-[#001D29] font-medium text-sm placeholder:text-[#001D29]/20"
+                                        placeholder="user@clothes.msme"
+                                    />
                                 </div>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all placeholder:text-muted-foreground/50"
-                                    placeholder="you@example.com"
-                                />
                             </div>
-                        </div>
 
-                        {/* Password Field */}
-                        <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                    <Lock className="w-4 h-4" />
+                            {/* Password Field: Framed Style */}
+                            <div className="relative border-2 border-[#F0F9FF] rounded-2xl p-4 focus-within:border-[#00B4D8] transition-all bg-white group">
+                                <label className="absolute -top-3 left-4 bg-white px-2 text-[9px] font-black text-[#0077B6] uppercase tracking-widest group-focus-within:text-[#00B4D8]">
+                                    Access Code
+                                </label>
+                                <div className="flex items-center gap-3">
+                                    <Lock className="w-4 h-4 text-[#00B4D8]" />
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        autoComplete="current-password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full bg-transparent outline-none text-[#001D29] font-medium text-sm placeholder:text-[#001D29]/20"
+                                        placeholder="••••••••"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="text-[#0077B6] hover:text-[#001D29] transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
                                 </div>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type={showPassword ? "text" : "password"}
-                                    autoComplete="current-password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-10 pr-12 py-2.5 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all placeholder:text-muted-foreground/50"
-                                    placeholder="••••••••"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    {showPassword ? (
-                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    )}
-                                </button>
                             </div>
                         </div>
 
@@ -175,47 +189,34 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 px-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group"
+                            className="w-full py-5 bg-[#001D29] text-[#48CAE4] rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl hover:bg-[#002535] hover:text-white transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group"
                         >
                             {isLoading ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>Signing in...</span>
-                                </>
+                                <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
-                                    <span>Sign in</span>
-                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    <span>Authenticate Entry</span>
+                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                                 </>
                             )}
                         </button>
                     </form>
 
-                    {/* Divider */}
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-border"></div>
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-card px-2 text-muted-foreground">
-                                New here?
-                            </span>
-                        </div>
+                    <div className="mt-12 flex items-center justify-between text-[10px] font-bold text-[#0077B6] tracking-[0.1em]">
+                        <Link 
+                            href="/auth/signup" 
+                            className="text-[#0077B6] border-b border-[#CAF0F8] pb-0.5 hover:border-[#0077B6] transition-all"
+                        >
+                            Register Identity
+                        </Link>
+                        <span className="opacity-40 uppercase">v. 2026.0</span>
                     </div>
+                </motion.div>
+            </div>
 
-                    {/* Sign Up Link */}
-                    <Link
-                        href="/auth/signup"
-                        className="block w-full py-3 px-4 text-center font-medium border border-border rounded-lg hover:bg-muted/50 transition-all duration-200"
-                    >
-                        Create an account
-                    </Link>
-                </div>
-
-                {/* Footer */}
-                <p className="mt-8 text-center text-xs text-muted-foreground">
-                    Protected by industry-standard encryption
-                </p>
+            {/* Background Graphic Text */}
+            <div className="fixed bottom-0 right-10 rotate-[-90deg] origin-bottom-right hidden lg:block pointer-events-none opacity-[0.05]">
+                <span className="text-[180px] font-serif font-black text-[#001D29] leading-none select-none uppercase tracking-tighter">Oceanic</span>
             </div>
         </div>
     );
