@@ -29,11 +29,13 @@ const OpsStateAnnotation = Annotation.Root({
     error: Annotation<string | undefined>({ reducer: (a, b) => b ?? a, default: () => undefined }),
 });
 
+type DecisionRoute = "planTasks" | "act" | "respond";
+
 /**
  * Decision routing function for conditional edges
  * Routes based on the agent's decision action
  */
-function routeAfterDecision(state: typeof OpsStateAnnotation.State): string {
+function routeAfterDecision(state: typeof OpsStateAnnotation.State): DecisionRoute {
     if (!state.decision) {
         return "respond"; // Fallback if no decision
     }
