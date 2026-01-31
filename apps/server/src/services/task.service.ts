@@ -1,4 +1,5 @@
-    import prisma from "@Hackron/db";
+import { TaskStatus, RequestStatus } from "../types/types";
+import prisma from "@Hackron/db";
 import { AppError } from "../middleware/error.middleware";
 
 /**
@@ -12,15 +13,15 @@ export class TaskService {
     async getAssignedTasks(workerId: string): Promise<any[]> {
         const tasks = await prisma.task.findMany({
             where: {
-                workerId: workerId, // Schema mismatch correction: assignedToId -> workerId
+                workerId: workerId,
                 status: {
-                    in: ["ASSIGNED", "IN_PROGRESS"],
+                    in: [TaskStatus.ASSIGNED, TaskStatus.IN_PROGRESS],
                 },
             },
             include: {
                 request: true,
             },
-            orderBy: { createdAt: 'asc' },
+            orderBy: { createdAt: "asc" },
         });
 
         return tasks;
@@ -35,17 +36,17 @@ export class TaskService {
         });
 
         if (!task) {
-            throw new AppError(404, 'Task not found');
+            throw new AppError(404, "Task not found");
         }
 
         if (task.workerId !== workerId) {
-            throw new AppError(403, 'Task not assigned to you');
+            throw new AppError(403, "Task not assigned to you");
         }
 
         await prisma.task.update({
             where: { id: taskId },
             data: {
-                status: "IN_PROGRESS",
+                status: TaskStatus.IN_PROGRESS,
                 startedAt: new Date(),
             },
         });
@@ -140,6 +141,25 @@ export class TaskService {
      */
     async setAvailability(workerId: string, shifts: any[]): Promise<void> {
         // Feature temporarily disabled
+        // TODO: Implement availability tracking
+        // Placeholder until WorkerAvailability model is confirmed/added
+        // Placeholder until WorkerAvailability model is confirmed/added
+        console.log("Setting worker availability:", { workerId, shifts });
+
+        // await prisma.workerAvailability.deleteMany({
+        //   where: {
+        //     workerId,
+        //     start: { gte: new Date() },
+        //   },
+        // });
+        //
+        // await prisma.workerAvailability.createMany({
+        //   data: shifts.map(shift => ({
+        //     workerId,
+        //     start: new Date(shift.start),
+        //     end: new Date(shift.end),
+        //   })),
+        // });
     }
 }
 

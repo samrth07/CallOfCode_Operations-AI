@@ -1,4 +1,5 @@
 import { AuditActor } from "../types/types";
+import prisma from "@Hackron/db";
 
 /**
  * Audit Service - Audit logging and tracking
@@ -9,6 +10,9 @@ export class AuditService {
     /**
      * Create an audit action record
      */
+    /**
+     * Create an audit action record
+     */
     async createAuditAction(data: {
         requestId?: string;
         actor: AuditActor;
@@ -16,19 +20,17 @@ export class AuditService {
         context: any;
         reason?: string;
     }): Promise<void> {
-        // TODO: Replace with actual Prisma
         console.log("Creating audit action:", data);
 
-        // In production:
-        // await prisma.auditAction.create({
-        //   data: {
-        //     requestId: data.requestId,
-        //     actor: data.actor,
-        //     action: data.action,
-        //     context: data.context,
-        //     reason: data.reason,
-        //   },
-        // });
+        await prisma.auditAction.create({
+            data: {
+                requestId: data.requestId,
+                actor: data.actor,
+                action: data.action,
+                context: data.context,
+                reason: data.reason,
+            },
+        });
     }
 
     /**
@@ -47,54 +49,52 @@ export class AuditService {
         const limit = filters.limit || 50;
         const skip = (page - 1) * limit;
 
-        // TODO: Replace with actual Prisma query
         console.log("Querying audit logs:", { filters, skip, limit });
 
-        // In production:
-        // const where: any = {};
-        //
-        // if (filters.requestId) {
-        //   where.requestId = filters.requestId;
-        // }
-        //
-        // if (filters.actor) {
-        //   where.actor = filters.actor;
-        // }
-        //
-        // if (filters.action) {
-        //   where.action = filters.action;
-        // }
-        //
-        // if (filters.startDate || filters.endDate) {
-        //   where.createdAt = {};
-        //   if (filters.startDate) {
-        //     where.createdAt.gte = filters.startDate;
-        //   }
-        //   if (filters.endDate) {
-        //     where.createdAt.lte = filters.endDate;
-        //   }
-        // }
-        //
-        // const [logs, total] = await Promise.all([
-        //   prisma.auditAction.findMany({
-        //     where,
-        //     skip,
-        //     take: limit,
-        //     include: {
-        //       request: true,
-        //     },
-        //     orderBy: { createdAt: 'desc' },
-        //   }),
-        //   prisma.auditAction.count({ where }),
-        // ]);
+        const where: any = {};
+
+        if (filters.requestId) {
+            where.requestId = filters.requestId;
+        }
+
+        if (filters.actor) {
+            where.actor = filters.actor;
+        }
+
+        if (filters.action) {
+            where.action = filters.action;
+        }
+
+        if (filters.startDate || filters.endDate) {
+            where.createdAt = {};
+            if (filters.startDate) {
+                where.createdAt.gte = filters.startDate;
+            }
+            if (filters.endDate) {
+                where.createdAt.lte = filters.endDate;
+            }
+        }
+
+        const [logs, total] = await Promise.all([
+            prisma.auditAction.findMany({
+                where,
+                skip,
+                take: limit,
+                include: {
+                    request: true,
+                },
+                orderBy: { createdAt: "desc" },
+            }),
+            prisma.auditAction.count({ where }),
+        ]);
 
         return {
-            data: [],
+            data: logs,
             pagination: {
-                total: 0,
+                total,
                 page,
                 limit,
-                totalPages: 0,
+                totalPages: Math.ceil(total / limit),
             },
         };
     }
