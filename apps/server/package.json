@@ -7,11 +7,15 @@
     "check-types": "tsc -b",
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
     "dev": "bun run --hot src/index.ts",
+    "seed": "bun run seed/index.ts",
     "start": "bun run dist/index.mjs"
   },
   "dependencies": {
     "@Hackron/db": "workspace:*",
     "@Hackron/env": "workspace:*",
+    "@google/generative-ai": "^0.24.1",
+    "@langchain/core": "^1.1.18",
+    "@langchain/langgraph": "^1.1.2",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

@@ -8,6 +8,15 @@ const router: IRouter = Router();
 router.use(agentGuard);
 
 /**
+ * @route   POST /internal/agent/enqueue
+ * @desc    Enqueue a request for agent processing
+ * @access  Internal (API Key)
+ */
+router.post("/enqueue", (req, res, next) =>
+    agentController.enqueueRequest(req, res).catch(next),
+);
+
+/**
  * @route   POST /internal/agent/re-evaluate/:requestId
  * @desc    Trigger LangGraph re-evaluation for a request
  * @access  Internal (API Key)
