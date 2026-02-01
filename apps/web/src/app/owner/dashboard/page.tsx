@@ -214,12 +214,6 @@ export default function OwnerDashboard() {
                                             onClick: () => router.push("/owner/inventory"),
                                         },
                                         {
-                                            title: "AI Rules",
-                                            icon: Settings,
-                                            desc: "Decision Engine",
-                                            onClick: () => router.push("/owner/rules"),
-                                        },
-                                        {
                                             title: "Audit Trail",
                                             icon: FileSearch,
                                             desc: "Verify Logs",
