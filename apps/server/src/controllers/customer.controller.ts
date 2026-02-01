@@ -46,8 +46,8 @@ export class CustomerController {
      */
     async createRequest(req: Request, res: Response): Promise<void> {
         var { payload, customerId } = req.body as CreateRequestRequest;
-        
-         if(customerId==="" || customerId==undefined){
+
+        if (customerId === "" || customerId == undefined) {
             customerId = req.user?.id
         }
         const requestId = await requestService.createRequest(
@@ -75,6 +75,21 @@ export class CustomerController {
         const response: RequestStatusResponse = status;
 
         res.status(200).json(response);
+    }
+    /**
+     * GET /api/requests
+     * Get all requests for current customer
+     */
+    async getRequests(req: Request, res: Response): Promise<void> {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const requests = await requestService.getRequestsForUser(userId);
+        res.status(200).json(requests);
     }
 }
 

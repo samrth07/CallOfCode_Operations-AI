@@ -30,6 +30,17 @@ router.post(
 );
 
 /**
+ * @route   GET /api/requests
+ * @desc    Get all requests for current customer
+ * @access  Authenticated
+ */
+router.get(
+    "/requests",
+    authenticate,
+    (req, res, next) => customerController.getRequests(req, res).catch(next),
+);
+
+/**
  * @route   GET /api/requests/:requestId/status
  * @desc    Get request status
  * @access  Public (optional auth)

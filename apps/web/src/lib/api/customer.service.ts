@@ -23,4 +23,13 @@ export const customerService = {
         const response = await apiClient.get(`/api/requests/${requestId}/status`);
         return response.data;
     },
+
+    /**
+     * Get all requests for the current customer
+     * GET /api/requests
+     */
+    async getMyRequests(): Promise<CustomerRequest[]> {
+        const response = await apiClient.get("/api/requests");
+        return response.data;
+    },
 };

@@ -8,16 +8,36 @@ import { motion } from "framer-motion";
 import {
     LogOut, User, Mail, Phone, Shield,
     PlusCircle, ListChecks, LayoutDashboard,
-    Settings, Bell, Search, Sparkles
+    Settings, Bell, Search, Sparkles, Clock, AlertCircle, CheckCircle2, ChevronRight
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { customerService } from "@/lib/api/customer.service";
+import type { CustomerRequest } from "@/lib/types/customer";
 
 export default function CustomerDashboard() {
     const { user, logout } = useAuth();
     const router = useRouter();
+    const [requests, setRequests] = useState<CustomerRequest[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleLogout = async () => {
         await logout();
         router.push("/auth/login");
+    };
+
+    useEffect(() => {
+        loadRequests();
+    }, []);
+
+    const loadRequests = async () => {
+        try {
+            const data = await customerService.getMyRequests();
+            setRequests(data);
+        } catch (error) {
+            console.error("Failed to load requests:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // Animation Variants
@@ -32,6 +52,27 @@ export default function CustomerDashboard() {
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: { y: 0, opacity: 1 }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "DONE":
+            case "COMPLETED": return "text-emerald-400 bg-emerald-400/10";
+            case "IN_PROGRESS": return "text-blue-400 bg-blue-400/10";
+            case "NEW": return "text-amber-400 bg-amber-400/10";
+            case "CANCELLED": return "text-red-400 bg-red-400/10";
+            default: return "text-white/60 bg-white/5";
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case "DONE":
+            case "COMPLETED": return <CheckCircle2 className="w-4 h-4" />;
+            case "IN_PROGRESS": return <Clock className="w-4 h-4" />;
+            case "NEW": return <AlertCircle className="w-4 h-4" />;
+            default: return <Clock className="w-4 h-4" />;
+        }
     };
 
     return (
@@ -157,11 +198,43 @@ export default function CustomerDashboard() {
                                         Recent Activity
                                         <div className="h-1.5 w-1.5 bg-[#00B4D8] rounded-full animate-pulse" />
                                     </h3>
-                                    <div className="space-y-6">
-                                        {/* Placeholder for empty state or real data */}
-                                        <div className="flex items-center gap-4 p-4 rounded-2xl border border-dashed border-white/10 text-white/20 text-sm justify-center">
-                                            No recent transactions found.
-                                        </div>
+                                    <div className="space-y-4">
+                                        {isLoading ? (
+                                             <div className="flex justify-center p-8">
+                                                <div className="w-8 h-8 border-2 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
+                                             </div>
+                                        ) : requests.length > 0 ? (
+                                            requests.map((req) => (
+                                                <div 
+                                                    key={req.id}
+                                                    className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-pointer"
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`p-2 rounded-xl ${getStatusColor(req.status)}`}>
+                                                            {getStatusIcon(req.status)}
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-semibold text-sm">
+                                                                {req.payload?.type ? req.payload.type.toUpperCase() : "REQUEST"} #{req.id.slice(0, 8)}
+                                                            </h4>
+                                                            <p className="text-xs text-white/40 pt-1">
+                                                                {new Date(req.createdAt).toLocaleDateString()} at {new Date(req.createdAt).toLocaleTimeString()}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-4">
+                                                        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${getStatusColor(req.status)}`}>
+                                                            {req.status}
+                                                        </span>
+                                                        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors" />
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="flex items-center gap-4 p-4 rounded-2xl border border-dashed border-white/10 text-white/20 text-sm justify-center">
+                                                No recent transactions found.
+                                            </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             </div>
