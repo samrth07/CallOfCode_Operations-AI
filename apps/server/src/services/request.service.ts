@@ -135,22 +135,6 @@ export class RequestService {
 
     /**
      * Get all requests for a specific customer
-     * Get requests for a specific customer (by User ID)
-     */
-    async getRequestsForUser(userId: string): Promise<any[]> {
-        const customer = await prisma.customer.findUnique({
-            where: { userId }
-        });
-
-        if (!customer) {
-            return [];
-        }
-
-        return this.getCustomerRequests(customer.id);
-    }
-
-    /**
-     * Get requests for a specific customer
      */
     async getCustomerRequests(customerId: string): Promise<any[]> {
         const requests = await prisma.request.findMany({

@@ -40,6 +40,13 @@ class OwnerService {
     /**
      * Force assign a request to a worker
      */
+    async forceAssign(requestId: string, workerId: string, reason: string): Promise<void> {
+        await apiClient.post(`/api/owner/requests/${requestId}/force-assign`, {
+            workerId,
+            reason,
+        });
+    }
+
     /**
      * Force assign a task to a worker
      */

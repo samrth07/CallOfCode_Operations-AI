@@ -97,6 +97,8 @@ async function seedUsers() {
             create: {
                 id: user.id,
                 name: user.name,
+                email: `${user.name.toLowerCase().replace(/\s+/g, '.')}@atelier.com`,
+                passwordHash: "$2b$10$EpIxQi0/jW6.F.h./.h./.h./.h./.h./.h./.h./.h./.h./.h.", // dummy hash
                 phone: user.phone || null,
                 role: user.role,
                 skills: user.skills ? user.skills.split(",").map((s) => s.trim()) : [],
@@ -118,7 +120,21 @@ async function seedCustomers() {
             create: {
                 id: customer.id,
                 name: customer.name,
+                email: `${customer.name.toLowerCase().replace(/\s+/g, '.')}@atelier.com`,
                 phone: customer.phone,
+                // Link to a user with the same ID, or create a placeholder user if needed
+                user: {
+                    connectOrCreate: {
+                        where: { id: customer.id },
+                        create: {
+                            id: customer.id,
+                            name: customer.name,
+                            email: `${customer.name.toLowerCase().replace(/\s+/g, '.')}@atelier.com`,
+                            passwordHash: "dummy",
+                            role: "CUSTOMER"
+                        }
+                    }
+                }
             },
         });
     }
