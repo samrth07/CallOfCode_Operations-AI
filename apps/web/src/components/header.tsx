@@ -6,7 +6,10 @@ import { ModeToggle } from "./mode-toggle";
 import { Scissors, Activity, ChevronRight } from "lucide-react";
 
 export default function Header() {
-  const links = [{ to: "/", label: "Home" }] as const;
+  const links = [
+    { to: "/", label: "Home" },
+    { to: "/auth/login", label: "Login" },
+  ] as const;
 
   return (
     <header className="w-full relative z-[100] bg-[#001D29] border-b border-white/5 shadow-2xl">
@@ -64,7 +67,12 @@ export default function Header() {
 
           <div className="flex items-center gap-4 pl-4 border-l border-white/10">
             <ModeToggle />
-            
+            <Link 
+              href="/auth/signup"
+              className="px-4 py-2 bg-[#0077B6] hover:bg-[#0096C7] text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all hover:scale-105"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
       </div>

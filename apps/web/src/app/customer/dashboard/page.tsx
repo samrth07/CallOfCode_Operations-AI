@@ -15,6 +15,7 @@ import { customerService } from "@/lib/api/customer.service";
 import type { CustomerRequest } from "@/lib/types/customer";
 
 export default function CustomerDashboard() {
+    // --- YOUR LOGIC: UNTOUCHED ---
     const { user, logout } = useAuth();
     const router = useRouter();
     const [requests, setRequests] = useState<CustomerRequest[]>([]);
@@ -41,7 +42,7 @@ export default function CustomerDashboard() {
     };
 
     // Animation Variants
-    const containerVariants = {
+    const staggerContainer = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -49,9 +50,9 @@ export default function CustomerDashboard() {
         }
     };
 
-    const itemVariants = {
+    const fadeInUp = {
         hidden: { y: 20, opacity: 0 },
-        visible: { y: 0, opacity: 1 }
+        visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
     };
 
     const getStatusColor = (status: string) => {
@@ -77,91 +78,93 @@ export default function CustomerDashboard() {
 
     return (
         <ProtectedRoute allowedRoles={[UserRole.CUSTOMER]}>
-            <div className="min-h-screen bg-[#001D29] text-white flex flex-col lg:flex-row relative overflow-hidden">
+            {/* Main Background: Consistent with your provided screenshot base [#E0F2F1] */}
+            <div className="min-h-screen w-full bg-[#E0F2F1] flex flex-col items-center justify-start p-4 md:p-8 lg:p-12 relative overflow-hidden font-sans">
+                
+                {/* Subtle Kinetic Accents using the palette electric blues */}
+                <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#00B4D8]/10 rounded-full blur-[120px] pointer-events-none" />
+                <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#0077B6]/10 rounded-full blur-[100px] pointer-events-none" />
 
-                {/* --- Ambient Background Elements --- */}
-                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#0096C7] rounded-full blur-[150px] opacity-10 pointer-events-none" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#00B4D8] rounded-full blur-[120px] opacity-10 pointer-events-none" />
-
-                {/* --- Unique Side Navigation --- */}
-                <aside className="w-full lg:w-24 bg-[#002535]/50 backdrop-blur-xl border-r border-white/5 flex flex-col items-center py-8 gap-8 z-20">
-                    <div className="w-12 h-12 bg-[#00B4D8] rounded-2xl flex items-center justify-center shadow-lg shadow-[#00B4D8]/20">
-                        <Sparkles className="w-6 h-6 text-white" />
+                {/* --- Customer Glass Header --- */}
+                <motion.header 
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="w-full max-w-7xl bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] px-8 py-4 mb-8 flex flex-col md:flex-row justify-between items-center shadow-[0_8px_32px_rgba(0,123,182,0.05)]"
+                >
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-[#001D29] rounded-2xl shadow-lg">
+                            <Sparkles className="w-6 h-6 text-[#48CAE4]" />
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold text-[#001D29] tracking-tight">Customer Portal</h1>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0077B6]">Premium Textiles Network</p>
+                        </div>
                     </div>
-                    <nav className="flex flex-row lg:flex-col gap-6">
-                        <button className="p-3 bg-white/10 rounded-xl text-[#48CAE4]"><LayoutDashboard className="w-6 h-6" /></button>
-                        <button className="p-3 text-white/40 hover:text-white transition-colors"><Bell className="w-6 h-6" /></button>
-                        <button className="p-3 text-white/40 hover:text-white transition-colors"><Settings className="w-6 h-6" /></button>
-                    </nav>
-                    <button
-                        onClick={handleLogout}
-                        className="mt-auto p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all group"
+
+                    <div className="flex items-center gap-6 mt-4 md:mt-0">
+                        <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#00B4D8]/10 rounded-full border border-[#00B4D8]/20">
+                            <Activity className="w-3 h-3 text-[#0077B6] animate-pulse" />
+                            <span className="text-[9px] font-bold text-[#0077B6] uppercase tracking-widest">Account Status: Active</span>
+                        </div>
+                        <button 
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#001D29] hover:text-[#0077B6] transition-colors group"
+                        >
+                            <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <span>Sign Out</span>
+                        </button>
+                    </div>
+                </motion.header>
+
+                {/* --- Main Grid Architecture --- */}
+                <motion.main 
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                    className="w-full max-w-7xl grid lg:grid-cols-12 gap-8 items-start"
+                >
+                    {/* LEFT COLUMN: Identity Monolith (Styled like login panel) */}
+                    <motion.section 
+                        variants={fadeInUp}
+                        className="lg:col-span-4 bg-[#001D29] rounded-[3rem] p-10 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[600px]"
                     >
-                        <LogOut className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                </aside>
+                        <div className="relative z-10 space-y-12">
+                            <div className="relative inline-block">
+                                <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-tr from-[#0096C7] to-[#48CAE4] p-1 shadow-2xl">
+                                    <div className="w-full h-full rounded-[1.8rem] bg-[#001D29] flex items-center justify-center">
+                                        <span className="text-4xl font-bold text-[#48CAE4]">{user?.name?.charAt(0)}</span>
+                                    </div>
+                                </div>
+                                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#48CAE4] rounded-2xl flex items-center justify-center border-4 border-[#001D29] shadow-lg">
+                                    <Shield className="w-4 h-4 text-[#001D29]" />
+                                </div>
+                            </div>
 
-                {/* --- Main Content Area --- */}
-                <main className="flex-1 relative z-10 p-4 md:p-8 lg:p-12 overflow-y-auto">
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-serif font-bold text-white tracking-tight">{user?.name}</h2>
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#48CAE4] opacity-80">Verified Member: {user?.role}</p>
+                            </div>
 
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                        className="max-w-6xl mx-auto space-y-10"
-                    >
-                        {/* Header Section */}
-                        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <motion.div variants={itemVariants}>
-                                <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
-                                <p className="text-[#00B4D8] font-medium mt-1">
-                                    Welcome back, <span className="text-white">{user?.name}</span>
-                                </p>
-                            </motion.div>
-
-                            <motion.div variants={itemVariants} className="relative w-full md:w-auto group">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                                <input
-                                    placeholder="Search services..."
-                                    className="w-full md:w-64 pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-[#00B4D8] transition-all"
-                                />
-                            </motion.div>
-                        </header>
-
-                        <div className="grid lg:grid-cols-3 gap-8">
-                            {/* Profile Card (Left) */}
-                            <motion.section
-                                variants={itemVariants}
-                                className="lg:col-span-1 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 space-y-8"
-                            >
-                                <div className="flex flex-col items-center text-center space-y-4">
-                                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#0096C7] to-[#48CAE4] p-1 shadow-2xl">
-                                        <div className="w-full h-full rounded-full bg-[#001D29] flex items-center justify-center">
-                                            <span className="text-3xl font-bold text-[#48CAE4]">{user?.name?.charAt(0)}</span>
-                                        </div>
+                            <div className="space-y-6 pt-10 border-t border-white/10">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/5 rounded-xl">
+                                        <Mail className="w-5 h-5 text-[#48CAE4]" />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-bold">{user?.name}</h2>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00B4D8] px-3 py-1 bg-[#00B4D8]/10 rounded-full mt-2 inline-block">
-                                            {user?.role}
-                                        </span>
+                                        <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Email Address</p>
+                                        <p className="text-sm font-medium text-white/90 truncate">{user?.email}</p>
                                     </div>
                                 </div>
-
-                                <div className="space-y-4 pt-4 border-t border-white/5">
-                                    <div className="flex items-center gap-4 text-white/70">
-                                        <Mail className="w-4 h-4 text-[#00B4D8]" />
-                                        <span className="text-sm truncate">{user?.email}</span>
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/5 rounded-xl">
+                                        <Phone className="w-5 h-5 text-[#48CAE4]" />
                                     </div>
-                                    <div className="flex items-center gap-4 text-white/70">
-                                        <Phone className="w-4 h-4 text-[#00B4D8]" />
-                                        <span className="text-sm">{user?.phone || "Private"}</span>
-                                    </div>
-                                    <div className="flex items-center gap-4 text-white/70">
-                                        <Shield className="w-4 h-4 text-[#00B4D8]" />
-                                        <span className="text-sm">Verified Member</span>
+                                    <div>
+                                        <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Mobile Contact</p>
+                                        <p className="text-sm font-medium text-white/90">{user?.phone || "Private Registry"}</p>
                                     </div>
                                 </div>
+<<<<<<< HEAD
                             </motion.section>
 
                             {/* Quick Actions & Feed (Right) */}
@@ -242,17 +245,96 @@ export default function CustomerDashboard() {
                                         )}
                                     </div>
                                 </motion.div>
+=======
+>>>>>>> 2448972bef6adb5193acb41ee70df43ae73917fd
                             </div>
                         </div>
-                    </motion.div>
-                </main>
+
+                        {/* Visual Watermark consistent with brand identity */}
+                        <div className="absolute bottom-[-2rem] right-[-2rem] opacity-5 pointer-events-none select-none">
+                            <Layers className="w-64 h-64 text-white -rotate-12" />
+                        </div>
+                    </motion.section>
+
+                    {/* RIGHT COLUMN: Interaction Module */}
+                    <div className="lg:col-span-8 space-y-8">
+                        <motion.section variants={fadeInUp} className="space-y-6">
+                            <div className="flex items-center justify-between px-2">
+                                <h3 className="text-xl font-serif font-bold italic text-[#001D29] tracking-wide">Account Overview</h3>
+                                <div className="h-[1px] flex-1 bg-[#001D29]/10 mx-6" />
+                            </div>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {/* Primary Action: Show Inventory using Electric Blue [#0077B6] */}
+                                <button 
+                                    onClick={() => router.push('/customer/inventory')}
+                                    className="group relative p-8 bg-[#0077B6] rounded-[2.5rem] shadow-xl shadow-[#0077B6]/20 transition-all hover:scale-[1.02] active:scale-98 overflow-hidden text-left"
+                                >
+                                    <div className="relative z-10 flex flex-col h-full justify-between">
+                                        <PlusCircle className="w-10 h-10 text-[#48CAE4] mb-8 transition-transform group-hover:rotate-90" />
+                                        <div>
+                                            <h4 className="text-2xl font-black text-white uppercase leading-none tracking-tighter">Show <br/> Inventory</h4>
+                                            <p className="mt-4 text-[10px] font-bold uppercase tracking-widest text-[#48CAE4] opacity-80">Browse Available Items</p>
+                                        </div>
+                                    </div>
+                                    <ArrowRight className="absolute bottom-8 right-8 w-6 h-6 text-white/30 group-hover:translate-x-2 transition-transform" />
+                                </button>
+
+                                {/* My Requests: Secondary Action */}
+                                <button className="group relative p-8 bg-white border border-[#001D29]/5 rounded-[2.5rem] shadow-lg shadow-[#001D29]/05 transition-all hover:shadow-xl hover:scale-[1.02] active:scale-98 text-left">
+                                    <ListChecks className="w-10 h-10 text-[#0077B6] mb-8 group-hover:scale-110 transition-transform" />
+                                    <div>
+                                        <h4 className="text-2xl font-black text-[#001D29] uppercase leading-none tracking-tighter">My <br/> Requests</h4>
+                                        <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-[#0077B6]">Track Project Status</p>
+                                    </div>
+                                </button>
+
+                                {/* Mini Controls Grid */}
+                                <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    {[
+                                        { title: "Dashboard", icon: LayoutDashboard, desc: "Main View" },
+                                        { title: "Notifications", icon: Bell, desc: "System Alerts" },
+                                        { title: "Settings", icon: Settings, desc: "Adjust Account" }
+                                    ].map((item, i) => (
+                                        <button key={i} className="flex flex-col items-center justify-center p-6 bg-white/60 backdrop-blur-sm border border-[#001D29]/5 rounded-[2rem] hover:bg-white transition-all group">
+                                            <item.icon className="w-6 h-6 text-[#0077B6] mb-3 group-hover:rotate-12 transition-transform" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#001D29]">{item.title}</span>
+                                            <span className="text-[8px] font-bold text-[#0077B6]/60 uppercase mt-1">{item.desc}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.section>
+
+                        {/* Recent Activity Module */}
+                        <motion.section 
+                            variants={fadeInUp}
+                            className="bg-white/60 backdrop-blur-sm border border-[#001D29]/10 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center justify-between gap-6"
+                        >
+                            <div className="flex items-center gap-6">
+                                <div className="p-4 bg-[#001D29] rounded-2xl shadow-lg">
+                                    <Activity className="w-8 h-8 text-[#48CAE4] animate-pulse" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-[#001D29] uppercase tracking-tight text-lg">Recent Activity</h4>
+                                    <p className="text-xs text-[#001D29]/60 font-medium">No recent transactions or status changes found in your registry.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-1">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="w-1.5 h-1.5 bg-[#0077B6] rounded-full opacity-30" />
+                                ))}
+                            </div>
+                        </motion.section>
+                    </div>
+                </motion.main>
             </div>
 
-            {/* --- Global Scrollbar Styling --- */}
+            {/* --- Global Custom Scrollbar --- */}
             <style jsx global>{`
                 ::-webkit-scrollbar { width: 5px; }
-                ::-webkit-scrollbar-thumb { background: rgba(0, 180, 216, 0.2); border-radius: 10px; }
-                ::-webkit-scrollbar-thumb:hover { background: rgba(0, 180, 216, 0.5); }
+                ::-webkit-scrollbar-track { background: transparent; }
+                ::-webkit-scrollbar-thumb { background: rgba(0, 180, 216, 0.1); border-radius: 10px; }
             `}</style>
         </ProtectedRoute>
     );
